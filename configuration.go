@@ -10,8 +10,8 @@ import (
 )
 
 type EngineConfiguration struct {
-	FirstValue  string `map:"firstValue"`
-	SecondValue string `map:"secondValue"`
+	FirstValue  string `mapstructure:"firstValue"`
+	SecondValue string `mapstructure:"secondValue"`
 	Logger      zerolog.Logger
 }
 
@@ -50,4 +50,15 @@ func setupLogging() zerolog.Logger {
 	log.Logger = log.With().Caller().Logger()
 
 	return log.Logger
+}
+
+func BuildConfiguration(viperRef *viper.Viper, config interface{}, defaults configuration.Defaults, envVars ...string) {
+	for _, envVar := range envVars {
+		_ = viperRef.BindEnv(envVar)
+	}
+
+	err := configuration.GetConfigWithDefaults(viperRef, config, defaults)
+	if err != nil {
+		panic(err)
+	}
 }
