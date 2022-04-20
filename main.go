@@ -1,7 +1,13 @@
 package main
 
-func main() {
-	config := initEngine("configuration")
+import (
+	"github.com/ElmosHomie492/strategy-game-engine/internal"
+)
 
-	config.Logger.Info().Msg(config.FirstValue)
+func main() {
+	var config internal.EngineConfiguration
+
+	config.Logger = config.SetupLogging()
+
+	config.Logger.Info().Msg("Starting Engine...")
 }

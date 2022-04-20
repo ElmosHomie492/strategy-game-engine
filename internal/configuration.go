@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"flag"
@@ -10,32 +10,26 @@ import (
 )
 
 type EngineConfiguration struct {
-	FirstValue  string `map:"firstValue"`
-	SecondValue string `map:"secondValue"`
-	Logger      zerolog.Logger
+	Logger zerolog.Logger `mapstructure:"logging"`
 }
 
-func initEngine(config string) EngineConfiguration {
+func BuildConfiguration(viperRef *viper.Viper, config string, envVars ...string) EngineConfiguration {
 	var engineConfig EngineConfiguration
 
-	viper.SetConfigName(config)
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
-	err := viper.ReadInConfig()
+	viperRef.SetConfigName(config)
+	viperRef.SetConfigType("yaml")
+	viperRef.AddConfigPath(".")
+	err := viperRef.ReadInConfig()
 	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %w", err))
 	}
 
 	viper.GetViper().Unmarshal(&engineConfig)
 
-	engineConfig.Logger = setupLogging()
-
-	engineConfig.Logger.Info().Msg("Starting Engine...")
-
 	return engineConfig
 }
 
-func setupLogging() zerolog.Logger {
+func (config *EngineConfiguration) SetupLogging() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	debug := flag.Bool("debug", false, "sets log level to debug")
 
@@ -47,7 +41,5 @@ func setupLogging() zerolog.Logger {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
 
-	log.Logger = log.With().Caller().Logger()
-
-	return log.Logger
+	config.Logger = log.With().Caller().Logger()
 }
