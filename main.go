@@ -1,15 +1,13 @@
 package main
 
+import (
+	"github.com/ElmosHomie492/strategy-game-engine/internal"
+)
+
 func main() {
-	config := initEngine("configuration")
-	
-	var config internal.Configuration
+	var config internal.EngineConfiguration
 
-	setup.BuildConfiguration(
-		viper.New(),
-		&config,
-		*internal.ConfigurationDefaults,
-	)
+	config.Logger = config.SetupLogging()
 
-	config.Logger.Info().Msg(config.FirstValue)
+	config.Logger.Info().Msg("Starting Engine...")
 }
